@@ -3,14 +3,35 @@
   const mapToken = "<%= process.env.MAP_TOKEN %>";
   const listing = <%- JSON.stringify(listing)  %>;
 </script>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <img class="lightbox-content" id="lightboxImg">
+</div>
+
 <div class="container-fluid px-3 px-md-4">
   <div class="row mt-3">
-    <!-- Title -->
+    <!-- Title and Share -->
     <div class="col-12 col-md-10 offset-md-1 col-lg-6 offset-lg-3">
-      <h3 class="text-center text-lg-start"><%= listing.title %></h3>
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="text-center text-lg-start"><%= listing.title %></h3>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fa-solid fa-share-nodes"></i> Share
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#" onclick="shareOn('facebook')"><i class="fa-brands fa-facebook me-2"></i>Facebook</a></li>
+            <li><a class="dropdown-item" href="#" onclick="shareOn('twitter')"><i class="fa-brands fa-twitter me-2"></i>Twitter</a></li>
+            <li><a class="dropdown-item" href="#" onclick="shareOn('whatsapp')"><i class="fa-brands fa-whatsapp me-2"></i>WhatsApp</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" onclick="copyLink()"><i class="fa-solid fa-link me-2"></i>Copy Link</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <!-- Listing Card -->
+    <!-- Listing Card with Clickable Image -->
     <div class="col-12 col-md-10 offset-md-1 col-lg-6 offset-lg-3 mb-4">
       <div class="card show-card listing-card">
         <%
@@ -22,39 +43,65 @@
             largeUrl = originalUrl.replace('/upload', '/upload/w_1600,h_1000,c_fill');
           }
         %>
-        <img src="<%= smallUrl %>" srcset="<%= smallUrl %> 800w, <%= largeUrl %> 1600w" sizes="(min-width:1200px) 50vw, 100vw" alt="<%= listing.title %> image" class="card-img-top show-img" loading="lazy" />
+        <img src="<%= smallUrl %>" srcset="<%= smallUrl %> 800w, <%= largeUrl %> 1600w" sizes="(min-width:1200px) 50vw, 100vw" alt="<%= listing.title %> image" class="card-img-top show-img" loading="lazy" style="cursor: pointer;" onclick="openLightbox(this.src)" />
+
         <div class="card-body mb-3">
-          <p class="mb-2 small text-muted">Owned by <b><%= listing.owner.username %></b></p>
-          <p class="mb-2"><%= listing.description %></p>
-          <p class="mb-1"><span class="badge bg-light text-dark">&#8377; <%= listing.price.toLocaleString("en-IN") %> / night</span></p>
-          <p class="mb-0 small text-muted"><%= listing.location %> • <%= listing.country %></p>
+          <div class="d-flex align-items-center mb-3">
+            <div class="user-avatar me-2" style="width: 40px; height: 40px;">
+              <%= listing.owner.username.charAt(0).toUpperCase() %>
+            </div>
+            <div>
+              <p class="mb-0 small"><strong>Hosted by <%= listing.owner.username %></strong></p>
+              <p class="mb-0 small text-muted">Member since 2024</p>
+            </div>
+          </div>
+
+          <p class="mb-3"><%= listing.description %></p>
+
+          <!-- Amenities -->
+          <div class="mb-3">
+            <h6 class="mb-2">What this place offers</h6>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge bg-light text-dark"><i class="fa-solid fa-wifi me-1"></i>Wifi</span>
+              <span class="badge bg-light text-dark"><i class="fa-solid fa-square-parking me-1"></i>Parking</span>
+              <span class="badge bg-light text-dark"><i class="fa-solid fa-kitchen-set me-1"></i>Kitchen</span>
+              <span class="badge bg-light text-dark"><i class="fa-solid fa-tv me-1"></i>TV</span>
+              <span class="badge bg-light text-dark"><i class="fa-solid fa-shower me-1"></i>Bathroom</span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <p class="mb-0"><span class="h4 text-success">&#8377; <%= listing.price.toLocaleString("en-IN") %></span> <span class="text-muted">/ night</span></p>
+          </div>
+          <p class="mb-0 small text-muted"><i class="fa-solid fa-location-dot me-1"></i><%= listing.location %> • <%= listing.country %></p>
         </div>
 
         <% if (currentUser && listing.owner._id.equals(currentUser._id)) { %>
           <div class="show-btns text-center mb-3">
             <div class="d-flex justify-content-center flex-wrap gap-2">
               <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">
-                Edit
+                <i class="fa-solid fa-pen-to-square me-1"></i>Edit
               </a>
               <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this listing?');">
-                <button class="btn btn-outline-danger">Delete</button>
+                <button class="btn btn-outline-danger"><i class="fa-solid fa-trash me-1"></i>Delete</button>
               </form>
             </div>
           </div>
         <% } %>
+
         <div class="text-center mb-3">
           <% if (currentUser) { %>
             <% if (!isFavorited) { %>
               <form method="POST" action="/listings/<%= listing._id %>/favorite" class="d-inline">
-                <button class="btn btn-sm btn-outline-success">Add to Favorites</button>
+                <button class="btn btn-outline-success"><i class="fa-solid fa-heart me-1"></i>Add to Favorites</button>
               </form>
             <% } else { %>
               <form method="POST" action="/listings/<%= listing._id %>/favorite?_method=DELETE" class="d-inline">
-                <button class="btn btn-sm btn-outline-danger">Remove Favorite</button>
+                <button class="btn btn-danger"><i class="fa-solid fa-heart-crack me-1"></i>Remove Favorite</button>
               </form>
             <% } %>
           <% } else { %>
-            <a href="/login" class="btn btn-sm btn-outline-secondary">Login to favorite</a>
+            <a href="/login" class="btn btn-outline-secondary"><i class="fa-solid fa-heart me-1"></i>Login to favorite</a>
           <% } %>
         </div>
       </div>
@@ -64,7 +111,7 @@
     <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 mb-3">
       <%  if(currentUser) { %>
       <hr/>
-      <h4 class="text-center">Leave a Review</h4>
+      <h4 class="text-center mb-4"><i class="fa-solid fa-star me-2" style="color: var(--accent);"></i>Leave a Review</h4>
       <form class="needs-validation" action="/listings/<%= listing._id %>/reviews" method="POST" novalidate>
         <div class="mb-3 mt-3">
           <label class="form-label" for="rating">Rating</label>
@@ -94,7 +141,7 @@
           </textarea>
           <div class="invalid-feedback">Please add some comments for review</div>
         </div>
-        <button class="btn btn-outline-dark" type="submit">Submit</button>
+        <button class="btn btn-search" type="submit">Submit Review</button>
       </form>
       <hr/>
       <% } %>
@@ -103,18 +150,25 @@
       <% if(listing.reviews.length > 0 ) { %>
         <div class="row g-3">
           <div class="col-12">
-            <p><b>All Reviews</b></p>
+            <h5><i class="fa-solid fa-comments me-2"></i>All Reviews (<%= listing.reviews.length %>)</h5>
           </div>
           <% for(let review of listing.reviews) { %>
-            <div class="col-12 col-sm-6 col-lg-4">
-              <div class="card h-100 shadow-sm p-3 text-center d-flex align-items-center justify-content-center">
+            <div class="col-12 col-sm-6 col-lg-4 scroll-reveal">
+              <div class="card h-100 shadow-sm p-3">
                 <div class="card-body">
-                  <h5 class="card-title"><%= review.author.username %></h5>
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                      <%= review.author.username.charAt(0).toUpperCase() %>
+                    </div>
+                    <h6 class="mb-0"><%= review.author.username %></h6>
+                  </div>
                   <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
-                  <p class="card-text"><b><%= review.comment %></b></p>
-                  <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST">
-                    <button class="btn btn-sm btn-outline-dark">Delete</button>
-                  </form>
+                  <p class="card-text small"><%= review.comment %></p>
+                  <% if (currentUser && (review.author._id.equals(currentUser._id) || listing.owner._id.equals(currentUser._id))) { %>
+                    <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST">
+                      <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash me-1"></i>Delete</button>
+                    </form>
+                  <% } %>
                 </div>
               </div>
             </div>
@@ -125,10 +179,52 @@
 
     <!-- Map Section -->
     <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 mb-3">
-      <h3 class="text-center text-lg-start">Where you'll be</h3>
+      <h3 class="text-center text-lg-start mb-3"><i class="fa-solid fa-map-location-dot me-2"></i>Where you'll be</h3>
       <div id="map"></div>
     </div>
   </div>
 </div>
 
 <script src="/js/map.js"></script>
+<script>
+  // Lightbox functionality
+  function openLightbox(src) {
+    document.getElementById('lightbox').classList.add('active');
+    document.getElementById('lightboxImg').src = src;
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+  }
+
+  // Close lightbox on click outside
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeLightbox();
+    }
+  });
+
+  // Share functionality
+  function shareOn(platform) {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent('<%= listing.title %>');
+
+    switch(platform) {
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        break;
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+        break;
+      case 'whatsapp':
+        window.open(`https://wa.me/?text=${title}%20${url}`, '_blank');
+        break;
+    }
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  }
+</script>

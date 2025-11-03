@@ -1,17 +1,82 @@
 <footer>
-    <div class="f-info container">
-        <div class="row w-100">
-            <div class="col-12 col-md-4 f-info-brand text-center text-md-start mb-2 mb-md-0">&copy; WanderLust Private Limited</div>
-            <div class="col-12 col-md-4 f-info-socials text-center mb-2 mb-md-0">
-                <i class="fa-brands fa-square-facebook me-2"></i>
-                <i class="fa-brands fa-square-instagram me-2"></i>
-                <i class="fa-brands fa-linkedin"></i>
+    <div class="f-info container-fluid">
+        <div class="container py-4">
+            <div class="row">
+                <!-- About Section -->
+                <div class="col-12 col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3"><i class="fa-solid fa-compass me-2" style="color: var(--accent);"></i>WanderLust</h5>
+                    <p class="text-muted small">Discover and share amazing places to stay around the world. Join our community of travelers and hosts.</p>
+                    <div class="mt-3">
+                        <a href="https://facebook.com" target="_blank" class="text-decoration-none me-3" aria-label="Facebook">
+                            <i class="fa-brands fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" class="text-decoration-none me-3" aria-label="Instagram">
+                            <i class="fa-brands fa-instagram fa-lg"></i>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" class="text-decoration-none me-3" aria-label="Twitter">
+                            <i class="fa-brands fa-twitter fa-lg"></i>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" class="text-decoration-none" aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-6 col-md-2 mb-4 mb-md-0">
+                    <h6 class="mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/about" class="text-muted small text-decoration-none">About Us</a></li>
+                        <li class="mb-2"><a href="/careers" class="text-muted small text-decoration-none">Careers</a></li>
+                        <li class="mb-2"><a href="/blog" class="text-muted small text-decoration-none">Blog</a></li>
+                        <li class="mb-2"><a href="/press" class="text-muted small text-decoration-none">Press</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div class="col-6 col-md-2 mb-4 mb-md-0">
+                    <h6 class="mb-3">Support</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted small text-decoration-none">Help Center</a></li>
+                        <li class="mb-2"><a href="/safety" class="text-muted small text-decoration-none">Safety</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted small text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="/feedback" class="text-muted small text-decoration-none">Feedback</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-12 col-md-4">
+                    <h6 class="mb-3">Stay Updated</h6>
+                    <p class="text-muted small">Subscribe to get special offers and travel tips!</p>
+                    <form class="d-flex" id="newsletterForm">
+                        <input type="email" class="form-control form-control-sm me-2" placeholder="Your email" required aria-label="Email for newsletter">
+                        <button type="submit" class="btn btn-sm btn-search">Subscribe</button>
+                    </form>
+                </div>
             </div>
-            <div class="col-12 col-md-4 f-info-links text-center text-md-end">
-                <a href="/privacy">Privacy</a>
-                <span class="mx-2">|</span>
-                <a href="/terms">Terms</a>
+
+            <!-- Bottom Bar -->
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+                    <small class="text-muted">&copy; 2025 WanderLust Private Limited. All rights reserved.</small>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="/privacy" class="text-muted small text-decoration-none me-3">Privacy Policy</a>
+                    <a href="/terms" class="text-muted small text-decoration-none me-3">Terms of Service</a>
+                    <a href="/cookies" class="text-muted small text-decoration-none">Cookie Policy</a>
+                </div>
             </div>
         </div>
     </div>
 </footer>
+
+<script>
+    // Newsletter form handling
+    document.getElementById('newsletterForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        alert('Thank you for subscribing! We\'ll send travel tips to ' + email);
+        this.reset();
+    });
+</script>

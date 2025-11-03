@@ -54,7 +54,7 @@
     </div>
     <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 g-4 mt-3">
       <% for(let listing of allListings) { %>
-        <a class="listing-link" href="/listings/<%= listing._id %>" >
+        <a class="listing-link scroll-reveal" href="/listings/<%= listing._id %>" >
           <div class="card col listing-card position-relative">
             <%
               // build responsive Cloudinary URLs (fall back to original if not a cloudinary URL)

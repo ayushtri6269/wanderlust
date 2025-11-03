@@ -1,14 +1,78 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row">
-    <div class="alert alert-danger col-6 offset-3" role="alert">
-        <div class="alert alert-primary d-flex align-items-center" role="alert">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-            </svg>
-            <div class="alert-heading">
-                <p><%= err.message %></p>
-            </div>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6 text-center py-5">
+      <!-- Error Icon -->
+      <div class="mb-4">
+        <% if (err.statusCode === 404) { %>
+          <i class="fa-solid fa-compass fa-6x" style="color: var(--accent); opacity: 0.3;"></i>
+        <% } else { %>
+          <i class="fa-solid fa-triangle-exclamation fa-6x" style="color: var(--accent); opacity: 0.3;"></i>
+        <% } %>
+      </div>
+      
+      <!-- Error Code -->
+      <h1 class="display-1 fw-bold" style="color: var(--accent);"><%= err.statusCode || 500 %></h1>
+      
+      <!-- Error Message -->
+      <h3 class="mb-3">
+        <% if (err.statusCode === 404) { %>
+          Oops! Page Not Found
+        <% } else { %>
+          Something Went Wrong
+        <% } %>
+      </h3>
+      
+      <p class="text-muted mb-4">
+        <%= err.message || "We couldn't process your request. Please try again." %>
+      </p>
+      
+      <!-- Error Details (only in development) -->
+      <% if (process.env.NODE_ENV !== 'production' && err.stack) { %>
+        <details class="text-start mt-4">
+          <summary class="btn btn-sm btn-outline-secondary mb-2">View Error Details (Dev Mode)</summary>
+          <pre class="bg-light p-3 rounded mt-2 text-start" style="font-size: 0.8rem; overflow-x: auto;"><%= err.stack %></pre>
+        </details>
+      <% } %>
+      
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+        <a href="/listings" class="btn btn-search">
+          <i class="fa-solid fa-home me-2"></i>Go to Homepage
+        </a>
+        <button onclick="window.history.back()" class="btn btn-outline-secondary">
+          <i class="fa-solid fa-arrow-left me-2"></i>Go Back
+        </button>
+      </div>
+      
+      <!-- Helpful Links -->
+      <div class="mt-5 pt-4 border-top">
+        <h6 class="text-muted mb-3">Need Help?</h6>
+        <div class="d-flex justify-content-center gap-4 flex-wrap">
+          <a href="/help" class="text-decoration-none text-muted small">
+            <i class="fa-solid fa-circle-question me-1"></i>Help Center
+          </a>
+          <a href="/contact" class="text-decoration-none text-muted small">
+            <i class="fa-solid fa-envelope me-1"></i>Contact Support
+          </a>
+          <a href="/listings" class="text-decoration-none text-muted small">
+            <i class="fa-solid fa-compass me-1"></i>Browse Listings
+          </a>
         </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<style>
+  /* Add subtle animation to error icon */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .fa-compass, .fa-triangle-exclamation {
+    animation: float 3s ease-in-out infinite;
+  }
+</style>

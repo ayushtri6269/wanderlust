@@ -16,7 +16,17 @@
         <button class="btn btn-search" type="submit" aria-label="Submit search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
       </form>
 
-      <ul class="navbar-nav ms-auto mb-0">
+      <ul class="navbar-nav ms-auto mb-0 d-flex align-items-center">
+        <!-- Dark Mode Toggle -->
+        <li class="nav-item me-3">
+          <div class="form-check form-switch mb-0">
+            <input class="form-check-input" type="checkbox" id="darkModeToggle" aria-label="Toggle dark mode">
+            <label class="form-check-label" for="darkModeToggle">
+              <i class="fa-solid fa-moon"></i>
+            </label>
+          </div>
+        </li>
+
         <% if (typeof currentUser === 'undefined' || !currentUser) { %>
           <li class="nav-item"><a class="nav-link" href="/signup"><strong>Signup</strong></a></li>
           <li class="nav-item"><a class="nav-link" href="/login"><strong>Login</strong></a></li>
