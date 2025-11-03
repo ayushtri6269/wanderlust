@@ -1,107 +1,81 @@
 <% layout("/layouts/boilerplate") %>
-    <!-- <h3>All Listings</h3> -->
-    <style>
-      #filters {
-        margin: 1rem ;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-      .filter {
-        text-align: center;
-        margin-right: 2rem;
-        margin-top: 2rem;
-        opacity: 0.8;
-      }
-      .filter:hover {
-        opacity: 1;
-        cursor: pointer;
-      }
-      .filter p {
-        font-size: 0.8rem;
-      }
-      .tax-info {
-        display: none;
-      }
-      .tax-toggle {
-        border:   1px solid black;
-        border-radius: 1rem;
-        margin-left: 2rem;
-        height: 3.25rem;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-      }
-    </style>
-
-    <div id="filters">
-      <div class="filter">
-        <div><i class="fa-solid fa-fire"></i></div>
-        <p>Trending</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-bed"></i></div>
-        <p>Rooms</p>
-      </div>
-            <div class="filter">
-        <div><i class="fa-solid fa-mountain-city"></i></div>
-        <p>Iconic Cities</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-mountain"></i></div>
-        <p>Mountains</p>
-      </div>
-            <div class="filter">
-        <div><i class="fa-brands fa-fort-awesome"></i></div>
-        <p>Castles</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-bed"></i></div>
-        <p>Amazing Pools</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-campground"></i></div>
-        <p>Compaing</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-cow"></i></div>
-        <p>Forms</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-snowflake"></i></div>
-        <p>Arctic</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-igloo"></i></div>
-        <p>Domes</p>
-      </div>
-      <div class="filter">
-        <div><i class="fa-solid fa-ship"></i></div>
-        <p>Boats</p>
-      </div>
-      <div class="tax-toggle">
-        <div class="form-check-reverse form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-          <label class="form-check-label" for="switchCheckDefault">Display After Total Taxes</label>
+    <div class="container-fluid hero-wrap bg-white py-5 mb-4 shadow-sm">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <h1 class="mb-2">Explore Listings</h1>
+            <p class="text-muted">Discover unique places to stay, handpicked by the community.</p>
+          </div>
+          <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="taxSwitch">
+              <label class="form-check-label ms-2" for="taxSwitch">Show taxes</label>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 d-flex flex-wrap gap-2">
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Trending' ? 'active' : '' %>" href="/listings?filter=Trending">Trending</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Rooms' ? 'active' : '' %>" href="/listings?filter=Rooms">Rooms</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Iconic Cities' ? 'active' : '' %>" href="/listings?filter=Iconic Cities">Iconic Cities</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Mountains' ? 'active' : '' %>" href="/listings?filter=Mountains">Mountains</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Castles' ? 'active' : '' %>" href="/listings?filter=Castles">Castles</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Amazing Pools' ? 'active' : '' %>" href="/listings?filter=Amazing Pools">Amazing Pools</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Camping' ? 'active' : '' %>" href="/listings?filter=Camping">Camping</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Farms' ? 'active' : '' %>" href="/listings?filter=Farms">Farms</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Arctic' ? 'active' : '' %>" href="/listings?filter=Arctic">Arctic</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Domes' ? 'active' : '' %>" href="/listings?filter=Domes">Domes</a>
+          <a class="btn btn-sm btn-outline-secondary <%= filter==='Boats' ? 'active' : '' %>" href="/listings?filter=Boats">Boats</a>
         </div>
       </div>
     </div>
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <% const qsBase = (p) => {
+               const params = new URLSearchParams();
+               if (q) params.set('q', q);
+               if (filter) params.set('filter', filter);
+               params.set('page', p);
+               return '?' + params.toString();
+          } %>
+          <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="<%= qsBase(page-1) %>">Previous</a>
+          </li>
+          <% for(let p=1; p<= totalPages; p++) { %>
+            <li class="page-item <%= p===page ? 'active' : '' %>"><a class="page-link" href="<%= qsBase(p) %>"><%= p %></a></li>
+          <% } %>
+          <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="<%= qsBase(page+1) %>">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-1 g-4 mt-3">
       <% for(let listing of allListings) { %>
         <a class="listing-link" href="/listings/<%= listing._id %>" >
-          <div class="card col listing-card">
-            <img
-              src="<%= listing.image.url %>"
-              class="card-img-top"
-              alt="listing_image"
-              style="height: 20rem;"
-            />
+          <div class="card col listing-card position-relative">
+            <%
+              // build responsive Cloudinary URLs (fall back to original if not a cloudinary URL)
+              const originalUrl = listing.image && listing.image.url ? listing.image.url : '/images/default.jpg';
+              let smallUrl = originalUrl;
+              let largeUrl = originalUrl;
+              if (originalUrl.includes('/upload')) {
+                smallUrl = originalUrl.replace('/upload', '/upload/w_600,h_400,c_fill');
+                largeUrl = originalUrl.replace('/upload', '/upload/w_1200,h_800,c_fill');
+              }
+            %>
+            <img src="<%= smallUrl %>" srcset="<%= smallUrl %> 600w, <%= largeUrl %> 1200w" sizes="(min-width:1200px) 25vw, (min-width:768px) 33vw, 100vw" class="card-img-top" alt="<%= listing.title %> image" loading="lazy" />
             <div class="card-img-overlay"></div>
+            <span class="price-badge">&#8377; <%= listing.price.toLocaleString("en-IN") %></span>
             <div class="card-body">
               <p class="card-text">
                 <b><%= listing.title %></b><br/>
-                &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
-                <i class="tax-info">&nbsp;&nbsp;+18%GST</i>
+                <span class="d-flex align-items-center gap-2">
+                  <span class="text-muted small">Per night</span>
+                  <i class="tax-info d-none small text-muted">+18% GST</i>
+                </span>
               </p>
             </div>
           </div>
@@ -110,17 +84,11 @@
     </div>
 
 <script>
-  let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-  taxSwitch.addEventListener("click", () => {
-    let taxInfo = document.getElementByClassName("tax-info")
-    for(info of taxInfo) {
-      if(info.style.display != "inline") {
-        info.style.display != "inline";
-      }
-      else {
-        info.style.display = "none";
-      }
-    }
-  })
+  const taxSwitch = document.getElementById('taxSwitch');
+  if (taxSwitch) {
+    taxSwitch.addEventListener('change', () => {
+      document.querySelectorAll('.tax-info').forEach(el => el.classList.toggle('d-none'));
+    });
+  }
 </script>
 

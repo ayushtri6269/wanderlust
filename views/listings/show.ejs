@@ -13,33 +13,50 @@
     <!-- Listing Card -->
     <div class="col-12 col-md-10 offset-md-1 col-lg-6 offset-lg-3 mb-4">
       <div class="card show-card listing-card">
-        <img
-          src="<%= listing.image.url %>"
-          alt="listing_image"
-          class="card-img-top show-img"
-        />
+        <%
+          const originalUrl = listing.image && listing.image.url ? listing.image.url : '/images/default.jpg';
+          let smallUrl = originalUrl;
+          let largeUrl = originalUrl;
+          if (originalUrl.includes('/upload')) {
+            smallUrl = originalUrl.replace('/upload', '/upload/w_800,h_500,c_fill');
+            largeUrl = originalUrl.replace('/upload', '/upload/w_1600,h_1000,c_fill');
+          }
+        %>
+        <img src="<%= smallUrl %>" srcset="<%= smallUrl %> 800w, <%= largeUrl %> 1600w" sizes="(min-width:1200px) 50vw, 100vw" alt="<%= listing.title %> image" class="card-img-top show-img" loading="lazy" />
         <div class="card-body mb-3">
-          <p>
-            <i>Owned By</i>&nbsp;&nbsp;<b><%= listing.owner.username %></b><br>
-            <%= listing.description %><br/>
-            &#8377; <%= listing.price.toLocaleString("en-IN") %><br/>
-            <%= listing.location %><br/>
-            <%= listing.country %>
-          </p>
+          <p class="mb-2 small text-muted">Owned by <b><%= listing.owner.username %></b></p>
+          <p class="mb-2"><%= listing.description %></p>
+          <p class="mb-1"><span class="badge bg-light text-dark">&#8377; <%= listing.price.toLocaleString("en-IN") %> / night</span></p>
+          <p class="mb-0 small text-muted"><%= listing.location %> • <%= listing.country %></p>
         </div>
 
         <% if (currentUser && listing.owner._id.equals(currentUser._id)) { %>
           <div class="show-btns text-center mb-3">
             <div class="d-flex justify-content-center flex-wrap gap-2">
-              <a href="/listings/<%= listing._id %>/edit" class="btn btn-primary">
+              <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary">
                 Edit
               </a>
-              <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE" class="d-inline">
-                <button class="btn btn-danger">Delete</button>
+              <form method="POST" action="/listings/<%=listing._id%>?_method=DELETE" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this listing?');">
+                <button class="btn btn-outline-danger">Delete</button>
               </form>
             </div>
           </div>
         <% } %>
+        <div class="text-center mb-3">
+          <% if (currentUser) { %>
+            <% if (!isFavorited) { %>
+              <form method="POST" action="/listings/<%= listing._id %>/favorite" class="d-inline">
+                <button class="btn btn-sm btn-outline-success">Add to Favorites</button>
+              </form>
+            <% } else { %>
+              <form method="POST" action="/listings/<%= listing._id %>/favorite?_method=DELETE" class="d-inline">
+                <button class="btn btn-sm btn-outline-danger">Remove Favorite</button>
+              </form>
+            <% } %>
+          <% } else { %>
+            <a href="/login" class="btn btn-sm btn-outline-secondary">Login to favorite</a>
+          <% } %>
+        </div>
       </div>
     </div>
 

@@ -42,6 +42,10 @@ router
     validateListing,
     wrapAsync(listingController.createListing));
 
+// Favorite / Unfavorite routes
+router.post('/:id/favorite', isLoggedIn, wrapAsync(listingController.addFavorite));
+router.delete('/:id/favorite', isLoggedIn, wrapAsync(listingController.removeFavorite));
+
 // NEW FORM
 router.get("/new", isLoggedIn, listingController.renderNewForm);// NEW: GET /listings/new
 

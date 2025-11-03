@@ -1,4 +1,5 @@
 const { Listing } = require("../utils/imports.js");
+const User = require('../models/user');
 const { storage, uploadToCloudinary, cloudinary } = require("../cloudConfig.js");
 
 // 🗺️ Mapbox Geocoding Setup
@@ -7,9 +8,50 @@ const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index =  async (req, res) => {
-  const allListings = await Listing.find({});
-  res.render("listings/index.ejs", { allListings });
+  const { q, filter } = req.query;
+  let query = {};
+
+  if (q) {
+    // simple text search on title, location or country (case-insensitive)
+    const regex = new RegExp(escapeRegex(q), 'i');
+    query.$or = [
+      { title: regex },
+      { location: regex },
+      { country: regex }
+    ];
+  }
+
+  if (filter) {
+    // example filters: Trending, Rooms, Mountains, Castles, etc.
+    // For now, interpret some common filters as tags or keywords in title/location
+    const f = filter.toLowerCase();
+    if (f === 'trending') {
+      // simple heuristic: sort by createdAt desc after finding
+    } else {
+      const regex = new RegExp(escapeRegex(filter), 'i');
+      query.$or = query.$or ? query.$or.concat([{ title: regex }, { location: regex }]) : [{ title: regex }, { location: regex }];
+    }
+  }
+
+  // Pagination
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const perPage = Math.max(parseInt(req.query.perPage) || 12, 1);
+
+  const total = await Listing.countDocuments(query);
+  const totalPages = Math.ceil(total / perPage) || 1;
+
+  const allListings = await Listing.find(query)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * perPage)
+    .limit(perPage);
+
+  res.render("listings/index.ejs", { allListings, q: q || '', filter: filter || '', page, totalPages });
 };
+
+// escape special regex characters in the search string
+function escapeRegex(text) {
+  return text.replace(/[-\\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
 
 // 👀 SHOW - Display one listing (with populated reviews & owner)
 module.exports.showListing = async (req, res) => {
@@ -26,7 +68,14 @@ module.exports.showListing = async (req, res) => {
     return res.redirect("/listings");
   }
 
-  res.render("listings/show.ejs", { listing });
+  // Determine if current user has favorited this listing
+  let isFavorited = false;
+  if (req.user) {
+    const user = await User.findById(req.user._id);
+    isFavorited = user.favorites && user.favorites.some(f => f.equals(listing._id));
+  }
+
+  res.render("listings/show.ejs", { listing, isFavorited });
 };
 
 // 🆕 NEW - Render form to create a new listing
@@ -115,9 +164,34 @@ module.exports.updateListing = async (req, res) => {
 };
 
 // ❌ DELETE - Delete a listing
-module.exports.destoryListing = async (req, res) => {
+module.exports.deleteListing = async (req, res) => {
   const { id } = req.params;
   await Listing.findByIdAndDelete(id);
   req.flash("success", "Listing Deleted!");
   res.redirect("/listings");
+};
+
+// Add to favorites
+module.exports.addFavorite = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(req.user._id);
+  if (!user.favorites) user.favorites = [];
+  if (!user.favorites.some(f => f.equals(id))) {
+    user.favorites.push(id);
+    await user.save();
+  }
+  req.flash('success', 'Added to favorites');
+  res.redirect(req.get('Referer') || `/listings/${id}`);
+};
+
+// Remove from favorites
+module.exports.removeFavorite = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(req.user._id);
+  if (user.favorites && user.favorites.some(f => f.equals(id))) {
+    user.favorites = user.favorites.filter(f => !f.equals(id));
+    await user.save();
+  }
+  req.flash('success', 'Removed from favorites');
+  res.redirect(req.get('Referer') || `/listings/${id}`);
 };
