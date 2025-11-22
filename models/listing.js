@@ -16,6 +16,10 @@ const listingSchema = new Schema(
     price: Number,
     location: String,
     country: String,
+    category: {
+      type: String,
+      enum: ['Trending', 'Rooms', 'Iconic Cities', 'Mountains', 'Castles', 'Amazing Pools', 'Camping', 'Farms', 'Arctic', 'Domes', 'Boats'],
+    },
     reviews: [{
       type: Schema.Types.ObjectId,
       ref: "Review",
@@ -36,10 +40,8 @@ const listingSchema = new Schema(
       }
     }
   },
-  {timestamps: true}
+  { timestamps: true }
 );
-
-// Cascade delete reviews when a listing is deleted
 
 // Cascade delete reviews when a listing is deleted
 listingSchema.post("findOneAndDelete", async (listing) => {

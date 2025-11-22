@@ -7,7 +7,7 @@ const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
-module.exports.index =  async (req, res) => {
+module.exports.index = async (req, res) => {
   const { q, filter } = req.query;
   let query = {};
 
@@ -22,14 +22,12 @@ module.exports.index =  async (req, res) => {
   }
 
   if (filter) {
-    // example filters: Trending, Rooms, Mountains, Castles, etc.
-    // For now, interpret some common filters as tags or keywords in title/location
-    const f = filter.toLowerCase();
-    if (f === 'trending') {
-      // simple heuristic: sort by createdAt desc after finding
+    // Filter by category field
+    if (filter.toLowerCase() === 'trending') {
+      // Trending: just sort by createdAt desc (already done in .sort())
     } else {
-      const regex = new RegExp(escapeRegex(filter), 'i');
-      query.$or = query.$or ? query.$or.concat([{ title: regex }, { location: regex }]) : [{ title: regex }, { location: regex }];
+      // Match exact category
+      query.category = filter;
     }
   }
 
@@ -94,10 +92,10 @@ module.exports.createListing = async (req, res) => {
     })
     .send();
 
-    if (!geoResponse.body.features.length) {
-      req.flash("error", "Location could not be geocoded");
-      return res.redirect("/listings/new");
-    }
+  if (!geoResponse.body.features.length) {
+    req.flash("error", "Location could not be geocoded");
+    return res.redirect("/listings/new");
+  }
 
   // 2️⃣ Upload file to Cloudinary
   const result = await uploadToCloudinary(req.file.buffer, "wanderlust_DEV");
@@ -140,7 +138,7 @@ module.exports.renderEditForm = async (req, res) => {
 module.exports.updateListing = async (req, res) => {
   const { id } = req.params;
 
-    // 1️⃣ Update text fields first
+  // 1️⃣ Update text fields first
   const listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
 
   // 2️⃣ Check if a new image was uploaded

@@ -19,13 +19,17 @@ router
   .route("/login")
   .get(userController.renderLoginForm)
   .post(
-  saveRedirectUrl,
-  passport.authenticate("local",{
-    failureRedirect: "/login",
-    failureFlash: true
-  }),
-  userController.login
-);
+    saveRedirectUrl,
+    passport.authenticate("local", {
+      failureRedirect: "/login",
+      failureFlash: true
+    }),
+    userController.login
+  );
+
+// FAVORITES
+const { isLoggedIn } = require("../utils/middleware.js");
+router.get("/favorites", isLoggedIn, wrapAsync(userController.renderFavorites));
 
 // LOGOUT
 router.get("/logout", userController.logout);

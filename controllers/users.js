@@ -54,3 +54,11 @@ module.exports.logout = (req, res, next) => {
     res.redirect("/listings");
   });
 };
+
+// ----------------------------
+// RENDER FAVORITES PAGE
+// ----------------------------
+module.exports.renderFavorites = async (req, res) => {
+  const user = await User.findById(req.user._id).populate('favorites');
+  res.render("users/favorites.ejs", { favorites: user.favorites || [] });
+};

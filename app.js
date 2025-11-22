@@ -16,24 +16,19 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
-require("dotenv").config();
 
 // Import routes
 const listingsRouter = require("./routes/listings");
 const reviewsRouter = require("./routes/reviews");
 const userRouter = require("./routes/user");
 
-//const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 // Database URL: prefer ATLASDB_URL, fall back to local Mongo for development
 const ATLASDB_URL = process.env.ATLASDB_URL || 'mongodb://127.0.0.1:27017/wanderlust';
 
 // Connect to MongoDB with error handling
 (async function main() {
   try {
-    await mongoose.connect(ATLASDB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(ATLASDB_URL);
     console.log('Connected to MongoDB');
   } catch (err) {
     console.error('Failed to connect to MongoDB:', err.message);
